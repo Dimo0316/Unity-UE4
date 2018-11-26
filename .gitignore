@@ -1,3 +1,5 @@
 
 VertexAnimation/.vs/VertexAnimation/v15/Browse.VC.db
 VertexAnimation/.vs/New Unity Project/v15/Browse.VC.db
+*.lock
+VertexAnimation/.vs
