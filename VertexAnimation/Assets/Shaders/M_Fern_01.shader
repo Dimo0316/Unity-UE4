@@ -90,24 +90,24 @@ Shader "Hidden/M_Fern_01"
 			float3 WPOWind(appdata v,float alphaWPO)
 			{
 				//WPOWind Rotate about axis WPO compatible with instanced/grouped static meshes
-				//float2 wordCoordsXY = mul(unity_ObjectToWorld, v.vertex).xy / _WPOWaveTile;
-				float2 wordCoordsXY =  v.vertex.xy / _WPOWaveTile;
+				float2 wordCoordsXY = mul(unity_ObjectToWorld, v.vertex).xz / _WPOWaveTile;
+				//float2 wordCoordsXY =  v.vertex.xy / _WPOWaveTile;
 				//float2 wordCoordsXY =  v.vertex.xy / _WPOWaveTile;
 				//Panner X/Y Axis move 
-				float3 pannerColorX = UnpackNormal(tex2Dlod(_WPOWaveSample, float4((wordCoordsXY + _Time.x * 0.3 * _WPOWaveSpeed * float2(_WPOXSpeed, 0)), 0, 0))).rgb;
+				float3 pannerColorX = UnpackNormal(tex2Dlod(_WPOWaveSample, float4((wordCoordsXY + _Time.x * 0.5 * _WPOWaveSpeed * float2(_WPOXSpeed, 0)), 0, 0))).rgb;
 				//pannerColorX = float3(pannerColorX.x, pannerColorX.z, pannerColorX.y);
-				float3 pannerColorY = UnpackNormal(tex2Dlod(_WPOWaveSample, float4((wordCoordsXY + _Time.x * 0.3 * _WPOWaveSpeed * float2(0, _WPOYSpeed)), 0, 0))).rgb;
+				float3 pannerColorY = UnpackNormal(tex2Dlod(_WPOWaveSample, float4((wordCoordsXY + _Time.x * 0.5 * _WPOWaveSpeed * float2(0, _WPOYSpeed)), 0, 0))).rgb;
 				//pannerColorY = float3(pannerColorY.x, pannerColorY.z, pannerColorY.y);
 				
 				//get the rotation angle
 				float  pannerAngle = (normalize(pannerColorX + pannerColorY)).r;
-				//float3 vertexNormal = mul(v.normal, (float3x3)unity_WorldToObject);
-				float3 vertexNormal = v.normal;
-				float3 rotarionNormal = float3(vertexNormal.x, vertexNormal.z, -vertexNormal.y);
+				float3 vertexNormal = mul(v.normal, (float3x3)unity_WorldToObject);
+				//float3 vertexNormal = v.normal;
+				float3 rotarionNormal = float3(vertexNormal.x, vertexNormal.y, vertexNormal.z);
 				float3 WPOWaveAmountXYZ = RotationAroundAxis(rotarionNormal, pannerAngle, fixed3(0, 0, -50), fixed3(0, 0, 0));
-				float3 WPOFloat3 = float3(WPOWaveAmountXYZ.x * 0.02, WPOWaveAmountXYZ.z * 0.02, WPOWaveAmountXYZ.y * 0.02);
+				float3 WPOFloat3 = float3(WPOWaveAmountXYZ.x * 0.02, WPOWaveAmountXYZ.z * 0.02, WPOWaveAmountXYZ.y * -0.02);
 				//float3 WPOFloat3 = float3(WPOWaveAmountXYZ.x * 0.02, WPOWaveAmountXYZ.y * 0.02, -WPOWaveAmountXYZ.z * 0.02);
-				return lerp(fixed3(0, 0, 0), WPOFloat3, alphaWPO);
+				return WPOFloat3;// lerp(fixed3(0, 0, 0), WPOFloat3, 1);
 			}
 
 			float3 PivotPainterWind(appdata v, float pivotAlpha, float3 pivotPosition)
@@ -158,13 +158,14 @@ Shader "Hidden/M_Fern_01"
 			fixed4 frag (v2f i) : SV_Target
 			{
 				fixed4 col = tex2D(_MainTex, i.uv);
+				clip(col.a-0.1);
 				//float3 color1 = lerp(mul(tex2D(_MainTex, i.uv).xyz, fixed(0.536, 0.615, 1)), (mul(tex2D(_MainTex, i.uv).xyz, 3)*0.3, fresnel(_FernN));
 				//fixed4  color2 = float4(color1, _MaxTex.a);
 				//get the material subsurtface color
 				/*float3 subSurfaceColor = mul(tex2D(_MainTex, i.uv), fixed3(0.0379, 0.04, 0.1));*/
 				
 				// just invert the colors
-				col.rgb = 1 - col.rgb;
+				//col.rgb = 1 - col.rgb;
 				return col;
 			}
 			ENDCG
