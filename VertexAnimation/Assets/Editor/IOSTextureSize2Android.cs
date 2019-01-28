@@ -33,6 +33,9 @@ namespace GiantEditor2
                 androidTexImporterSettings.resizeAlgorithm = iphoneTexImporterSettings.resizeAlgorithm;
 
                 texImporter.SetPlatformTextureSettings(androidTexImporterSettings);
+                texImporter.SaveAndReimport();
+                //EditorUtility.DisplayProgressBar();
+                //EditorUtility.ClearProgressBar();
             }
 
             AssetDatabase.Refresh();
